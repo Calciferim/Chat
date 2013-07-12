@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Chat</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="About_text">asdfasdf \n asdfasdf</string>
+    
+    <color name="backloginReg">#cad3e1</color>
+    <color name="fontlogin">#0a2966</color>
+    <color name="fontReg">#343434</color>
+    <color name="RedAtt">#d72024</color>
+
+</resources>

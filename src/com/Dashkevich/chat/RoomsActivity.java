@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -33,28 +34,7 @@ public class RoomsActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_rooms);
-	/*	final String[] items = new String[] { "q", "w", "e", "r", "t", "y",
-				"q", "w", "e", "r", "t", "y", "q", "w", "e", "r", "t", "y" };
-		LV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-		
-			@Override
-			public void onItemClick(AdapterView<?> adapter, View v,
-					int position, long itemid) {
-				Toast.makeText(RoomsActivity.this, items[position], 50).show();
-			}
-
-		});
-		LV.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-
-			@Override
-			public boolean onItemLongClick(AdapterView<?> adapter, View v,
-					int position, long itemid) {
-				Toast.makeText(RoomsActivity.this, items[position] + "LONG", 50)
-						.show();
-				return true;
-			}
-
-		}); */
+		  
 	}
 
 	@Override
@@ -67,12 +47,22 @@ public class RoomsActivity extends BaseActivity {
 		}
 		LV = (ListView) findViewById(R.id.list);
 		LV.setAdapter(mAdapter);
+		LV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			  
+			  @Override public void onItemClick(AdapterView<?> adapter, View v, int
+			  position, long itemid) { 
+				  Intent inte = new Intent();
+					inte.setClass(RoomsActivity.this, ChatActivity.class);
+					startActivity(inte);
+			  }
+			  
+			  });
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.rooms, menu);
-		
+
 		return true;
 	}
 
@@ -96,6 +86,13 @@ public class RoomsActivity extends BaseActivity {
 		return super.onCreateDialog(id);
 	}
 
+	@Override
+	public void onBackPressed() {
+	//	android.os.Process.killProcess(android.os.Process.myPid());
+		stopSystem();
+		super.onBackPressed();
+	}
+
 	public Dialog ShowAddRoom() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Add room");
@@ -108,9 +105,9 @@ public class RoomsActivity extends BaseActivity {
 			@Override
 			public CharSequence filter(CharSequence source, int start, int end,
 					Spanned dest, int dstart, int dend) {
-				String text=source.toString()+dest.toString();
-				String[] arr=text.split("\n");
-				if((arr != null && arr.length > 3) || text.length() > 36){
+				String text = source.toString() + dest.toString();
+				String[] arr = text.split("\n");
+				if ((arr != null && arr.length > 3) || text.length() > 36) {
 					return "";
 				}
 				return null;
@@ -121,25 +118,21 @@ public class RoomsActivity extends BaseActivity {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						EditText Name = (EditText) view.findViewById(R.id.dialog_Name);
-						EditText Desk = (EditText) view.findViewById(R.id.dialog_Desk);
+						EditText Name = (EditText) view
+								.findViewById(R.id.dialog_Name);
+						EditText Desk = (EditText) view
+								.findViewById(R.id.dialog_Desk);
 						if (Name.getText().toString() == null
 								|| Name.getText().toString().length() == 0
 								|| Desk.getText().toString() == null
 								|| Desk.getText().toString().length() == 0) {
 							Toast.makeText(RoomsActivity.this,
-									"Name or desk is not filled", Toast.LENGTH_SHORT)
-									.show();
+									"Name or desk is not filled",
+									Toast.LENGTH_SHORT).show();
 						} else {
-							Room r = new Room(Name.getText().toString());
-							r.setPeople(1);
-							r.setStatus(Room.Status.ok);
-							try {
-								mCore.getAPI().getRooms().add(r);
-							} catch (ParserException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
+							// Õ≈ –¿¡Œ“¿≈“!!!!
+							mCore.getAPI().addRoom(Name.getText().toString());
+							// Õ≈ –¿¡Œ“¿≈“!!!!
 							mAdapter.notifyDataSetChanged();
 						}
 					}
@@ -147,4 +140,5 @@ public class RoomsActivity extends BaseActivity {
 		builder.setNegativeButton("Cancel", null);
 		return builder.create();
 	}
+
 }

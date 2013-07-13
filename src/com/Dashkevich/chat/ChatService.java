@@ -31,5 +31,9 @@ public class ChatService extends Service {
 	public API getAPI (){
 		return mAPI;
 	}
-
+@Override
+public void onDestroy() {
+	mAPI=null;
+	super.onDestroy();
+}
 }

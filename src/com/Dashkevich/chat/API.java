@@ -20,7 +20,7 @@ import android.util.Log;
 public class API {
 	private AuthInfo mAI;
 	private boolean isAuth = false;
-	private static final String BASE_URL="http://10.2.1.27:6606/";
+	private static final String BASE_URL="http://10.2.1.38:6606/";
 
 	public static String connect(String url) {
 
@@ -135,5 +135,8 @@ public class API {
 		List<Room> list = new ArrayList<Room>();
 		Parser.getRooms(resp, list);
 		return list;
+	}
+	public void addRoom (String name) {
+		String resp=connect(BASE_URL+"addroom?token="+mAI.mToken+"&name="+name);
 	}
 }

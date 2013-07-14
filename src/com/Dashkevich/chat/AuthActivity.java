@@ -1,6 +1,7 @@
 package com.Dashkevich.chat;
 
 import com.Dashkevich.chat.API.APIexception;
+import com.Dashkevich.chat.API.AuthCallback;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -67,15 +68,23 @@ public class AuthActivity extends BaseActivity {
 	public void OnLoginClick(View view) {
 		EditText Email = (EditText) findViewById(R.id.editText1);
 		EditText Pass = (EditText) findViewById(R.id.editText2);
-		try {
 			mCore.getAPI().auth(Email.getText().toString(),
-					Pass.getText().toString());
-			Intent i=new Intent(this, RoomsActivity.class);
-			startActivity(i);
-			finish();
-		} catch (APIexception e) {
-			Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
-		}
+					Pass.getText().toString(), new AuthCallback() {
+						
+						@Override
+						public void AuthCallbackSuccess() {
+							Intent i=new Intent(AuthActivity.this, RoomsActivity.class);
+							startActivity(i);
+							finish();
+							
+						}
+						
+						@Override
+						public void AuthCallbackFaild(String message) {						
+							Toast.makeText(AuthActivity.this, message, Toast.LENGTH_LONG).show();
+							
+						}
+					});
 	}
 
 	public void OnRegisterClick(View view) {

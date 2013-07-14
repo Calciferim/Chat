@@ -42,6 +42,7 @@ public class Parser {
 		public final int err_code;
 
 		public ParserException(int errcode) {
+			super("Errcode: "+String.valueOf(errcode));
 			err_code = errcode;
 		}
 

@@ -15,12 +15,15 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.Dashkevich.chat.Parser.ParserException;
 
+import android.os.Handler;
 import android.util.Log;
 
 public class API {
 	private AuthInfo mAI;
 	private boolean isAuth = false;
-	private static final String BASE_URL="http://10.2.1.38:6606/";
+	private static final String BASE_URL = "http://10.2.1.12:6606/";
+	private final Object mSyncObject = new Object();
+	private final Handler mHandler = new Handler();
 
 	public static String connect(String url) {
 
@@ -87,36 +90,49 @@ public class API {
 	}
 
 	public void reg(Person p) {
-		String resp = connect(BASE_URL+"reg?email="
-				+ p.getmEmail() + "&pass=" + p.getmPass() + "&sex="
-				+ p.getmSex() + "&age=" + p.getmAge() + "&nick=" + p.getmNick());
-		
+		String resp = connect(BASE_URL + "reg?email=" + p.getmEmail()
+				+ "&pass=" + p.getmPass() + "&sex=" + p.getmSex() + "&age="
+				+ p.getmAge() + "&nick=" + p.getmNick());
+
 	}
 
-	public void auth(String email, String pass) throws APIexception {
-		if (!isAuth) {
-
-			try {
-				String resp = connect(BASE_URL+"auth?email="
-						+ email + "&pass=" + pass);
-				mAI = Parser.auth(resp);
-			}catch (ParserException p){
-				switch (p.err_code) {
-				case 1:
-					
-					break;
-
-				default:
-					break;
-				}
-				
-			} catch (Exception e) {
-				throw new APIexception(e);
+	public void auth(final String email, final String pass,
+			final AuthCallback callback) {
+		synchronized (mSyncObject) {
+			if (isAuth) {
+				callback.AuthCallbackFaild("Already Authed");
 			}
-			isAuth = true;
-		} else {
-			throw new APIexception("the user is already logged in");
 		}
+		Thread thread = new Thread("AuthThread") {
+			public void run() {
+
+				try {
+					String resp = connect(BASE_URL + "auth?email=" + email
+							+ "&pass=" + pass);
+					mAI = Parser.auth(resp);
+					isAuth = true;
+					mHandler.post(new Runnable() {
+
+						@Override
+						public void run() {
+							callback.AuthCallbackSuccess();
+						}
+					});
+				} catch (final Exception e) {
+					mHandler.post(new Runnable() {
+
+						@Override
+						public void run() {
+							callback.AuthCallbackFaild(e.getMessage());
+
+						}
+					});
+
+				}
+			}
+		};
+		thread.start();
+
 	}
 
 	class APIexception extends Exception {
@@ -128,15 +144,23 @@ public class API {
 		public APIexception(String string) {
 			super(string);
 		}
-
 	}
-	public List<Room> getRooms () throws ParserException {
-		String resp=connect(BASE_URL+"rooms?token="+mAI.mToken);
+
+	public List<Room> getRooms() throws ParserException {
+		String resp = connect(BASE_URL + "rooms?token=" + mAI.mToken);
 		List<Room> list = new ArrayList<Room>();
 		Parser.getRooms(resp, list);
 		return list;
 	}
-	public void addRoom (String name) {
-		String resp=connect(BASE_URL+"addroom?token="+mAI.mToken+"&name="+name);
+
+	public void addRoom(String name) {
+		String resp = connect(BASE_URL + "addroom?token=" + mAI.mToken
+				+ "&name=" + name);
+	}
+
+	public interface AuthCallback {
+		public void AuthCallbackSuccess();
+
+		public void AuthCallbackFaild(String message);
 	}
 }
